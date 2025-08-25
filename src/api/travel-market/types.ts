@@ -4,12 +4,23 @@ export interface PaginationParams {
   order_desc?: boolean // Сортировка по убыванию (по умолчанию false)
 }
 
-export type TouristParams = Omit<PaginationParams, 'order_desc'> & {
+export type TouristParams<F> = Omit<PaginationParams, 'order_desc'> & {
   search?: string // Строка для поиска по имени, телефону
-  fields?: (keyof Tourist)[] // Поля, которые нужно вернуть в ответе (по умолчанию name)
+  fields?: F // Поля, которые нужно вернуть в ответе (по умолчанию name)
   id?: number // Фильтр по идентификатору туриста
   manager_id?: number // Фильтр по идентификатору менеджера
   office_id?: number // Фильтр по идентификатору офиса
+}
+
+export interface TempTourist {
+  id: number
+  name: string
+  tel: string
+  email: string
+  manager_id?: number
+  office_id?: number
+  manager_name?: string
+  office_name?: string
 }
 
 export interface Tourist {
@@ -56,6 +67,27 @@ export interface Tourist {
 
 export type PaymentParams = Partial<Omit<Payment, 'payment_id' | 'amount' | 'exchange_rate' | 'comission' | 'comment' | 'payment_date' | 'payment_create_date'>
   & PaginationParams>
+
+export interface PreorderParams {
+  tourist_type: 'tourist' | 'tourist_temp'
+  tourist_id: number
+  flightdate_from?: string
+  flightdate_to?: string
+  persons?: number
+  children?: number
+  children_ages?: number[]
+  price_from?: number
+  price_to?: number
+  comment?: string
+  source?: string
+}
+
+export interface Preorder {
+  preorder_id: number
+  tourist_id: number
+  manager_id: number
+  // другие поля могут быть добавлены по мере необходимости
+}
 
 export interface Payment {
   // Идентификаторы
