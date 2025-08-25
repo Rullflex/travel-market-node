@@ -2,7 +2,7 @@ module.exports = {
   apps: [
     {
       name: 'travel-market',
-      script: 'dist/index.js',
+      script: 'dist/main.js',
       node_args: '-r dotenv-flow/config',
     },
   ],
