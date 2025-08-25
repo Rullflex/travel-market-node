@@ -1,4 +1,16 @@
-export type TouristFields = keyof Tourist
+export interface PaginationParams {
+  count?: number // Количество записей на странице (по умолчанию 20, максимум 100)
+  offset?: number // Смещение от начала списка (по умолчанию 0)
+  order_desc?: boolean // Сортировка по убыванию (по умолчанию false)
+}
+
+export type TouristParams = Omit<PaginationParams, 'order_desc'> & {
+  search?: string // Строка для поиска по имени, телефону
+  fields?: (keyof Tourist)[] // Поля, которые нужно вернуть в ответе (по умолчанию name)
+  id?: number // Фильтр по идентификатору туриста
+  manager_id?: number // Фильтр по идентификатору менеджера
+  office_id?: number // Фильтр по идентификатору офиса
+}
 
 export interface Tourist {
   // Идентификаторы (числовые)
@@ -17,17 +29,17 @@ export interface Tourist {
   passport_series: string
   passport_number: string
   passport_who: string
-  passport_when: Date
-  passport_till: Date
+  passport_when: string // формат: 'DD-MM-YYYY'
+  passport_till: string // формат: 'DD-MM-YYYY'
 
   // Российский паспорт
   passport_series_rus: string
   passport_number_rus: string
   passport_who_rus: string
-  passport_when_rus: Date
+  passport_when_rus: string // формат: 'DD-MM-YYYY'
 
   // Личные данные
-  dr: Date // дата рождения
+  dr: string // дата рождения, формат: 'YYYY-MM-DD'
   gender: 'male' | 'female'
 
   // Настройки уведомлений
@@ -40,4 +52,33 @@ export interface Tourist {
 
   // Дополнительная информация
   comments: string
+}
+
+export type PaymentParams = Partial<Omit<Payment, 'payment_id' | 'amount' | 'exchange_rate' | 'comission' | 'comment' | 'payment_date' | 'payment_create_date'>
+  & PaginationParams>
+
+export interface Payment {
+  // Идентификаторы
+  payment_id: number
+  order_id: number
+  tourist_id: number
+  tour_id: number
+  manager_id: number
+
+  // Даты
+  payment_date: string // формат: 'YYYY-MM-DD HH:mm:ss'
+  payment_create_date: string // формат: 'YYYY-MM-DD HH:mm:ss'
+
+  // Финансовые данные
+  amount: string // десятичное число в строковом формате
+  exchange_rate: string // десятичное число в строковом формате
+  comission: string // десятичное число в строковом формате
+
+  // Тип и направление платежа
+  payment_direction: 'in' | 'out'
+  payment_type: 'cash' | 'card' | 'bank' // можно расширить при необходимости
+  tourist_type: 'tourist' | 'agent' // можно расширить при необходимости
+
+  // Дополнительная информация
+  comment: string
 }

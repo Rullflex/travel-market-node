@@ -1,8 +1,9 @@
-import type { Tourist, TouristFields } from './types'
+import type { Payment, PaymentParams, Tourist, TouristParams } from './types'
 import { http } from './http'
 
 export const MoiDokumentiApi = {
-  searchTourists: <T extends TouristFields[]>(search: string, fields: T) => {
-    return http.post<{ [K in T[number]]: Tourist[K] }[]>('get-tourist-list', { fields, search })
+  getTourists: <T extends (keyof Tourist)[]>(params: TouristParams) => {
+    return http.post<{ [K in T[number]]: Tourist[K] }[]>('get-tourist-list', params)
   },
+  getPayments: (params?: PaymentParams) => http.post<Payment[]>('get-payment-list', params),
 }
