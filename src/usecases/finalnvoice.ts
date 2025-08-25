@@ -4,16 +4,7 @@ import { BitrixApi } from '@/api/bitrix'
 import { MoiDokumentiApi } from '@/api/travel-market'
 import { createPreorderLink, formatPreorderComment } from '@/utils'
 
-const data: DealData = {
-  // тестовые данные
-  deal_id: '1',
-  phone: '+79001234567',
-  email: 'test@example.com',
-}
-
-async function main() {
-  // TODO: Здесь должна быть логика получения data из запроса
-
+export async function handleFinalInvoice(data: DealData) {
   let foundTourists: {
     tourists: Awaited<ReturnType<typeof searchTourists>>['tourists']
     temp_tourists: Awaited<ReturnType<typeof searchTourists>>['temp_tourists']
@@ -138,5 +129,3 @@ async function createPreorder(tourist: TempTourist, data: DealData) {
 
   return response
 }
-
-main()
