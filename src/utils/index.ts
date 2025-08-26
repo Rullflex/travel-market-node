@@ -1,2 +1,2 @@
-export * from './createPreorderLink'
-export * from './formatPreorderComment'
+export * from './createPreorderLink.js'
+export * from './formatPreorderComment.js'

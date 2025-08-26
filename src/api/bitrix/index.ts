@@ -1,1 +1,1 @@
-export { BitrixApi } from './BitrixApi'
+export { BitrixApi } from './BitrixApi.js'

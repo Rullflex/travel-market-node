@@ -1,3 +1,3 @@
-export * from './finalnvoice'
-export * from './tourConfirm'
-export * from './tourFullPaymentOperator'
+export * from './finalnvoice.js'
+export * from './tourConfirm.js'
+export * from './tourFullPaymentOperator.js'

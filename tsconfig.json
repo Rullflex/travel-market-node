@@ -4,8 +4,8 @@
     "target": "ES2022",
     "baseUrl": ".",
     "rootDir": "./src",
-    "module": "ESNext",
-    "moduleResolution": "Node",
+    "module": "NodeNext",
+    "moduleResolution": "NodeNext",
     "noStrictGenericChecks": false,
     "paths": {
       "@/*": ["src/*"]

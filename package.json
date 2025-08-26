@@ -5,10 +5,8 @@
   "license": "ISC",
   "main": "dist/main.js",
   "scripts": {
-    "dev": "tsx watch -r dotenv-flow/config src/main.ts",
-    "build": "tsc && tsc-alias",
-    "build:prod": "NODE_OPTIONS='--max-old-space-size=4096' tsc && tsc-alias",
-    "start": "node -r dotenv-flow/config dist/main.js",
+    "build": "NODE_OPTIONS='--max-old-space-size=4096' tsc && tsc-alias",
+    "start": "npm run build:prod && fastify start -l info dist/app.js",
     "lint": "eslint",
     "lint:fix": "eslint --fix"
   },

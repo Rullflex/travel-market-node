@@ -1,6 +1,6 @@
-import type { TourFullPaymentOperatorData } from '@/routes/types'
-import { BitrixApi } from '@/api/bitrix'
-import { TOUR_PAID_TO_OPERATOR_STAGE } from '@/const'
+import type { TourFullPaymentOperatorData } from '@/routes/types.js'
+import { BitrixApi } from '@/api/bitrix/index.js'
+import { TOUR_PAID_TO_OPERATOR_STAGE } from '@/const/index.js'
 
 export async function tourFullPaymentOperator({ deal_id, cost, comission }: TourFullPaymentOperatorData) {
   const comment = [

@@ -1,8 +1,8 @@
-import type { TempTourist, Tourist } from '@/api/travel-market'
-import type { DealData } from '@/routes/types'
-import { BitrixApi } from '@/api/bitrix'
-import { MoiDokumentiApi } from '@/api/travel-market'
-import { createPreorderLink, formatPreorderComment } from '@/utils'
+import type { TempTourist, Tourist } from '@/api/travel-market/types.js'
+import type { DealData } from '@/routes/types.js'
+import { BitrixApi } from '@/api/bitrix/index.js'
+import { MoiDokumentiApi } from '@/api/travel-market/index.js'
+import { createPreorderLink, formatPreorderComment } from '@/utils/index.js'
 
 export async function handleFinalInvoice(data: DealData) {
   let foundTourists: {

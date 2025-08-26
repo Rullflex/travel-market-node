@@ -1,2 +1,2 @@
-export { MoiDokumentiApi } from './MoiDokumentiApi'
-export * from './types'
+export { MoiDokumentiApi } from './MoiDokumentiApi.js'
+export * from './types.js'

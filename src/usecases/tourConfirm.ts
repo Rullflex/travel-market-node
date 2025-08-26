@@ -1,6 +1,6 @@
-import type { TourData } from '@/routes/types'
-import { BitrixApi } from '@/api/bitrix'
-import { TOUR_CONFIRMED_STAGE } from '@/const'
+import type { TourData } from '@/routes/types.js'
+import { BitrixApi } from '@/api/bitrix/index.js'
+import { TOUR_CONFIRMED_STAGE } from '@/const/index.js'
 
 export async function tourConfirm(data: TourData) {
   const comment = [

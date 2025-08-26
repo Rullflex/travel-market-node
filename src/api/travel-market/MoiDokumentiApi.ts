@@ -1,5 +1,5 @@
-import type { Payment, PaymentParams, Preorder, PreorderParams, TempTourist, Tourist, TouristParams } from './types'
-import { http } from './http'
+import type { Payment, PaymentParams, Preorder, PreorderParams, TempTourist, Tourist, TouristParams } from './types.js'
+import { http } from './http.js'
 
 export const MoiDokumentiApi = {
   getTourists: <T extends (keyof Tourist)[]>(params?: TouristParams<T>) => {

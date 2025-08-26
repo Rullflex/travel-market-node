@@ -1,5 +1,5 @@
 import axios, { toFormData } from 'axios'
-import { MOIDOKUMENTI_BASE_URL } from '@/const'
+import { MOIDOKUMENTI_BASE_URL } from '@/const/index.js'
 
 export const http = axios.create({
   baseURL: `${MOIDOKUMENTI_BASE_URL}/api/`,
