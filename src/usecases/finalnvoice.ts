@@ -1,5 +1,5 @@
 import type { TempTourist, Tourist } from '@/api/travel-market'
-import type { DealData } from '@/types'
+import type { DealData } from '@/routes/types'
 import { BitrixApi } from '@/api/bitrix'
 import { MoiDokumentiApi } from '@/api/travel-market'
 import { createPreorderLink, formatPreorderComment } from '@/utils'

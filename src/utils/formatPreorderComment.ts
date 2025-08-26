@@ -1,4 +1,4 @@
-import type { DealData } from '@/types'
+import type { DealData } from '@/routes/types'
 
 export function formatPreorderComment(data: DealData, preorderName: string): string {
   return [
