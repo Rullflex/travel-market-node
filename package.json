@@ -6,7 +6,7 @@
   "main": "dist/main.js",
   "scripts": {
     "build": "NODE_OPTIONS='--max-old-space-size=4096' tsc && tsc-alias",
-    "start": "npm run build:prod && fastify start -l info dist/app.js",
+    "start": "fastify start -l info dist/app.js",
     "lint": "eslint",
     "lint:fix": "eslint --fix"
   },
