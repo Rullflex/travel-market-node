@@ -58,7 +58,7 @@ export async function handleFinalInvoice(data: DealData) {
     const preorderUrl = createPreorderLink(addPreorderResponse?.data.preorder_id || -1)
 
     // Обновляем сделку в Битрикс24
-    const updateDealResponse = await BitrixApi.updateDeal(Number.parseInt(data.deal_id), {
+    const updateDealResponse = await BitrixApi.updateDeal(data.deal_id, {
       UF_CRM_1753433653919: preorderUrl,
     })
 

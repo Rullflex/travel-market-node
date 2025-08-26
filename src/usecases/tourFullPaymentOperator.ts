@@ -2,7 +2,7 @@ import type { TourFullPaymentOperatorData } from '@/routes/types'
 import { BitrixApi } from '@/api/bitrix'
 import { TOUR_PAID_TO_OPERATOR_STAGE } from '@/const'
 
-export async function tourFullPaymentOperator({ dealId, cost, comission }: TourFullPaymentOperatorData) {
+export async function tourFullPaymentOperator({ deal_id, cost, comission }: TourFullPaymentOperatorData) {
   const comment = [
     'Информация об оплате тура оператору:',
     `Стоимость оплаты туроператору: ${cost}`,
@@ -10,7 +10,7 @@ export async function tourFullPaymentOperator({ dealId, cost, comission }: TourF
   ].join('\n')
 
   try {
-    await BitrixApi.updateDeal(Number(dealId), {
+    await BitrixApi.updateDeal(deal_id, {
       COMMENTS: comment, // TODO куда записывать данные
       STAGE_ID: TOUR_PAID_TO_OPERATOR_STAGE,
     })

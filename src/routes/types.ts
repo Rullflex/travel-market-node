@@ -15,6 +15,8 @@ export interface DealData {
 }
 
 export interface TourData {
+  deal_id: string
+
   country: string // Страна
   dates: string // Даты поездки
   tourists: string // Туристы по туру
@@ -28,7 +30,7 @@ export interface TourData {
 }
 
 export interface TourFullPaymentOperatorData {
-  dealId: string
+  deal_id: string
   cost: string
   comission: string
 }
