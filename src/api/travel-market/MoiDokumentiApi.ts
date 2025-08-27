@@ -1,4 +1,4 @@
-import type { Payment, PaymentParams, Preorder, PreorderParams, TempTourist, Tourist, TouristParams } from './types.js'
+import type { Payment, PaymentParams, Preorder, PreorderParams, TempTourist, Tour, Tourist, TouristParams, TourParams } from './types.js'
 import { http } from './http.js'
 
 export const MoiDokumentiApi = {
@@ -18,4 +18,7 @@ export const MoiDokumentiApi = {
     return http.post<Preorder>('create-preorder', params)
   },
   getPayments: (params?: PaymentParams) => http.post<Payment[]>('get-payment-list', params),
+  getTours: <T extends (keyof Tour)[]>(params?: TourParams<T>) => {
+    return http.post<{ [K in T[number]]: Tour[K] }[]>('get-tour-list', params)
+  },
 }

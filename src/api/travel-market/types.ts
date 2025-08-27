@@ -114,3 +114,16 @@ export interface Payment {
   // Дополнительная информация
   comment: string
 }
+
+export interface Tour {
+  tour_id: number
+  docs: string
+  comission_tourist: string
+  comission_touroperator: string
+}
+
+export type TourParams<F> = PaginationParams & {
+  fields?: F
+  tour_id?: number
+  tourist_id?: number
+}

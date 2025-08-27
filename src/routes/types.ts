@@ -14,23 +14,20 @@ export interface DealData {
   tour_price?: string
 }
 
-export interface TourData {
-  deal_id: string
+export interface TourFullPaymentData {
+  event_type: 'tour_full_payment_operator' | 'tour_full_payment_tourist'
 
-  country: string // Страна
-  dates: string // Даты поездки
-  tourists: string // Туристы по туру
-  tour_operator: string // Туроператор
-  contract_cost: string // Стоимость договора для туриста
-  payment_terms: string // Сроки оплаты (если оплачен не полностью)
-  contract_number: string // Номер договора
-  contract_name: string // Название договора
-  tour_operator_cost: string // Стоимость оплаты ТурОператору
-  commission: string // Комиссия по туру
-}
-
-export interface TourFullPaymentOperatorData {
   deal_id: string
-  cost: string
-  comission: string
+  tour_id: string
+
+  country: string // Страна отдыха
+  tour_date_start: string // Дата начала тура
+  tour_date_end: string // Дата окончания тура
+  tourists: string // Список туристов по туру через запятую
+  tour_operator: string // Туроператор по туру
+  tour_tourist_cost: string // Стоимость тура для туриста
+  tour_operator_cost: string // Стоимость тура у туроператора
+  tour_payment_date: string // Срок полной оплаты по туру туристом
+  tour_contract_number: string // Номер договора по туру
+  tour_name: string // Название тура
 }

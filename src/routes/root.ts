@@ -1,21 +1,9 @@
 import type { FastifyPluginAsyncJsonSchemaToTs } from '@fastify/type-provider-json-schema-to-ts'
-import type { TourData, TourFullPaymentOperatorData } from './types.js'
-import { handleFinalInvoice, tourConfirm, tourFullPaymentOperator } from '@/usecases/index.js'
+import type { TourFullPaymentData } from './types.js'
+import { handleFinalInvoice, tourFullPayment } from '@/usecases/index.js'
 
 const routes: FastifyPluginAsyncJsonSchemaToTs = async (fastify, _opts): Promise<void> => {
-  fastify.get('/health', {
-    schema: {
-      response: {
-        200: {
-          type: 'object',
-          properties: {
-            status: { type: 'string' },
-            timestamp: { type: 'string' },
-          },
-        },
-      },
-    } as const,
-  }, async (_request, _reply) => {
+  fastify.get('/health', async () => {
     return {
       status: 'OK',
       timestamp: new Date().toISOString(),
@@ -48,12 +36,9 @@ const routes: FastifyPluginAsyncJsonSchemaToTs = async (fastify, _opts): Promise
     return await handleFinalInvoice(request.query)
   })
 
-  fastify.post('/tour-full-payment-operator', async (req) => {
-    await tourFullPaymentOperator(req.body as TourFullPaymentOperatorData)
-  })
-
-  fastify.post('/tour-confirm', async (req) => {
-    await tourConfirm(req.body as TourData)
+  fastify.post('/tour-full-payment', async (req) => {
+    const { body } = req as { body: TourFullPaymentData }
+    await tourFullPayment(body)
   })
 }
 
