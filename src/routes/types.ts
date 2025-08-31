@@ -17,7 +17,6 @@ export interface DealData {
 export interface TourFullPaymentData {
   event_type: 'tour_full_payment_operator' | 'tour_full_payment_tourist'
 
-  deal_id: string
   tour_id: string
 
   country: string // Страна отдыха
@@ -26,8 +25,8 @@ export interface TourFullPaymentData {
   tourists: string // Список туристов по туру через запятую
   tour_operator: string // Туроператор по туру
   tour_tourist_cost: string // Стоимость тура для туриста
-  tour_operator_cost: string // Стоимость тура у туроператора
   tour_payment_date: string // Срок полной оплаты по туру туристом
+  tour_operator_cost: string // Стоимость тура у туроператора
   tour_contract_number: string // Номер договора по туру
   tour_name: string // Название тура
 }

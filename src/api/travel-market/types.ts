@@ -68,7 +68,7 @@ export interface Tourist {
 export type PaymentParams = Partial<Omit<Payment, 'payment_id' | 'amount' | 'exchange_rate' | 'comission' | 'comment' | 'payment_date' | 'payment_create_date'>
   & PaginationParams>
 
-export interface PreorderParams {
+export interface CreatePreorderParams {
   tourist_type: 'tourist' | 'tourist_temp'
   tourist_id: number
   flightdate_from?: string
@@ -82,10 +82,18 @@ export interface PreorderParams {
   source?: string
 }
 
+export type GetPreordersParams<F> = PaginationParams & {
+  fields?: F
+  preorder_id?: number
+  tourist_id?: number
+}
+
 export interface Preorder {
   preorder_id: number
   tourist_id: number
+  tour_id: number
   manager_id: number
+  comment: string
   // другие поля могут быть добавлены по мере необходимости
 }
 
@@ -117,6 +125,8 @@ export interface Payment {
 
 export interface Tour {
   tour_id: number
+  preorder_id: number | null
+  tourist_list: string[]
   docs: string
   comission_tourist: string
   comission_touroperator: string
