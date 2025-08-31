@@ -3,7 +3,7 @@ import type { TourFullPaymentData } from './types.js'
 import { handleFinalInvoice, tourFullPayment } from '@/usecases/index.js'
 
 const routes: FastifyPluginAsyncJsonSchemaToTs = async (fastify, _opts): Promise<void> => {
-  fastify.get('/health', async () => {
+  fastify.get('/', async () => {
     return {
       status: 'OK',
       timestamp: new Date().toISOString(),
