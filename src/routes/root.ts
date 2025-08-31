@@ -32,25 +32,28 @@ const routes: FastifyPluginAsyncJsonSchemaToTs = async (fastify, _opts): Promise
         },
       } as const,
     },
-  }, async (request, _reply) => {
-    return await handleFinalInvoice(request.query)
+  }, async (request, reply) => {
+    try {
+      return await handleFinalInvoice(request.query)
+    } catch (err) {
+      const { message } = err as Error
+      request.log.error(request.query, message)
+      return reply.badRequest(message)
+    }
   })
 
   fastify.post('/tour-full-payment', async (req, reply) => {
     const { body } = req as { body: TourFullPaymentData }
-    const logger = req.log.child({}, { msgPrefix: '[tour-full-payment] ' })
-    logger.info({ body })
 
     if (!body) {
       return reply.badRequest('Body is empty')
     }
 
     try {
-      const result = await tourFullPayment(body)
-      return reply.send(result)
+      return await tourFullPayment(body)
     } catch (err) {
       const { message } = err as Error
-      logger.error(message)
+      req.log.error(body, message)
       return reply.badRequest(message)
     }
   })

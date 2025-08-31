@@ -6,8 +6,6 @@ export async function tourFullPayment(data: TourFullPaymentData) {
   const { data: tours } = await MoiDokumentiApi.getTours({
     tour_id: Number(data.tour_id),
     fields: ['comission_tourist', 'preorder_id'],
-  }).catch((error) => {
-    throw new Error(`[MoiDokumentiApi.getTours]: ${error.message}`)
   })
 
   if (!tours.length) {
@@ -21,8 +19,6 @@ export async function tourFullPayment(data: TourFullPaymentData) {
   const { data: preorders } = await MoiDokumentiApi.getPreorders({
     preorder_id: tours[0].preorder_id,
     fields: ['comment'],
-  }).catch((error) => {
-    throw new Error(`[MoiDokumentiApi.getPreorders]: ${error.message}`)
   })
 
   if (!preorders.length) {

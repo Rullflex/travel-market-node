@@ -52,27 +52,18 @@ export async function handleFinalInvoice(data: DealData) {
     }
   }
 
-  if (finalTourist) {
-    // Создаем обращение
-    const addPreorderResponse = await createPreorder(finalTourist, data)
-    const preorderUrl = createPreorderLink(addPreorderResponse?.data.preorder_id || -1)
-
-    // Обновляем сделку в Битрикс24
-    const updateDealResponse = await BitrixApi.updateDeal(data.deal_id, {
-      UF_CRM_1753433653919: preorderUrl,
-    })
-
-    console.warn({
-      input: data,
-      tourist: finalTourist,
-      add_preorder_response: addPreorderResponse,
-      preorder_url: preorderUrl,
-      update_deal_response: updateDealResponse,
-      found_tourists: foundTourists,
-    })
-  } else {
-    console.error('Не удалось создать или найти туриста', data)
+  if (!finalTourist) {
+    throw new Error('Не удалось создать туриста')
   }
+
+  // Создаем обращение
+  const addPreorderResponse = await createPreorder(finalTourist, data)
+  const preorderUrl = createPreorderLink(addPreorderResponse?.data.preorder_id || -1)
+
+  // Обновляем сделку в Битрикс24
+  await BitrixApi.updateDeal(data.deal_id, {
+    UF_CRM_1753433653919: preorderUrl,
+  })
 }
 
 async function searchTourists(searchValue: string) {
