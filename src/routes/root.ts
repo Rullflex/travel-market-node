@@ -13,6 +13,8 @@ const routes: FastifyPluginAsyncJsonSchemaToTs = async (fastify, _opts): Promise
   fastify.post('/final-invoice', async (req, reply) => {
     const { body } = req as { body: BitrixDealEvent }
 
+    req.log.debug(body)
+
     if (!body) {
       return reply.badRequest('Body is empty')
     }
@@ -29,10 +31,8 @@ const routes: FastifyPluginAsyncJsonSchemaToTs = async (fastify, _opts): Promise
       return reply.badRequest('Stage is not FINAL_INVOICE')
     }
 
-    req.log.debug(body)
-
     try {
-      // return await handleFinalInvoice(request.body)
+      // return await handleFinalInvoice(body.data.FIELDS.ID)
     } catch (err) {
       const { message } = err as Error
       req.log.error(body, message)
