@@ -46,7 +46,7 @@ export async function tourFullPayment(data: TourFullPaymentData) {
     UF_CRM_1756467743: data.tour_operator_cost,
     UF_CRM_1756467646: data.tour_contract_number,
     UF_CRM_1756467598: data.tour_name,
-    OPPORTUNITY: Number(tours[0].comission_tourist),
+    OPPORTUNITY: tours[0].comission_tourist,
     STAGE_ID: data.event_type === 'tour_full_payment_tourist' ? 'UC_UVH8TG' : 'UC_S9VTVS',
   }).catch((error) => {
     throw new Error(`[BitrixApi.updateDeal]: ${error.message}`)
