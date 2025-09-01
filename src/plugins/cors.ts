@@ -1,4 +1,4 @@
-import type { FastifySensibleOptions } from '@fastify/sensible'
+import type { FastifyCorsOptions } from '@fastify/cors'
 import cors from '@fastify/cors'
 import fp from 'fastify-plugin'
 
@@ -7,7 +7,7 @@ import fp from 'fastify-plugin'
  *
  * @see https://github.com/fastify/fastify-cors
  */
-export default fp<FastifySensibleOptions>(async (fastify) => {
+export default fp<FastifyCorsOptions>(async (fastify) => {
   fastify.register(cors, {
     origin: true,
   })
