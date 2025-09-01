@@ -33,7 +33,7 @@ const routes: FastifyPluginAsyncJsonSchemaToTs = async (fastify, _opts): Promise
 
       console.log('deal result: ', deal)
 
-      const { data: { result: contact } } = await BitrixApi.getContact(deal.CONTACT_IDS[0])
+      const { data: { result: contact } } = await BitrixApi.getContact(deal.CONTACT_ID)
 
       console.log('contact result: ', contact)
       // return await handleFinalInvoice(body.data.FIELDS.ID)

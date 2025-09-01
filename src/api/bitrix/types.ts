@@ -23,7 +23,7 @@ export interface BitrixDeal {
   TAX_VALUE: string
   LEAD_ID: string | null
   COMPANY_ID: string
-  CONTACT_IDS: string[]
+  CONTACT_ID: string
   QUOTE_ID: string | null
   BEGINDATE: string
   CLOSEDATE: string
