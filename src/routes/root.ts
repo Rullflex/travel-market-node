@@ -1,6 +1,6 @@
 import type { FastifyPluginAsyncJsonSchemaToTs } from '@fastify/type-provider-json-schema-to-ts'
 import type { TourFullPaymentData } from './types.js'
-import { handleFinalInvoice, tourFullPayment } from '@/usecases/index.js'
+import { tourFullPayment } from '@/usecases/index.js'
 
 const routes: FastifyPluginAsyncJsonSchemaToTs = async (fastify, _opts): Promise<void> => {
   fastify.get('/', async () => {
