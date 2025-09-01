@@ -1,37 +1,38 @@
+import type { BitrixDeal } from '@/api/bitrix/index.js'
 import type { TempTourist, Tourist } from '@/api/travel-market/types.js'
-import type { DealData } from '@/routes/types.js'
 import { BitrixApi } from '@/api/bitrix/index.js'
 import { MoiDokumentiApi } from '@/api/travel-market/index.js'
 import { createPreorderLink, formatPreorderComment } from '@/utils/index.js'
 
-export async function handleFinalInvoice(data: DealData) {
+export async function handleFinalInvoice(dealId: string) {
+  const { data: { result: deal } } = await BitrixApi.getDeal(dealId)
+  const { data: { result: contact } } = await BitrixApi.getContact(deal.CONTACT_ID)
+
   let foundTourists: {
     tourists: Awaited<ReturnType<typeof searchTourists>>['tourists']
     temp_tourists: Awaited<ReturnType<typeof searchTourists>>['temp_tourists']
   } = { tourists: [], temp_tourists: [] }
 
   // Поиск по телефону
-  if (data.phone) {
-    foundTourists = await searchTourists(data.phone)
+  if (contact.PHONE?.length) {
+    foundTourists = await searchTourists(contact.PHONE[0].VALUE)
   }
 
   // Если не найдено по телефону и есть email — ищем по email
-  if (foundTourists.tourists.length === 0
-    && foundTourists.temp_tourists.length === 0
-    && data.email) {
-    foundTourists = await searchTourists(data.email)
+  if (!foundTourists.tourists.length && !foundTourists.temp_tourists.length && contact.EMAIL?.length) {
+    foundTourists = await searchTourists(contact.EMAIL[0].VALUE)
   }
 
   let finalTourist: Awaited<ReturnType<typeof createTourist>> | null = null
 
   // Если никого не нашли - создаем нового туриста
-  if (foundTourists.tourists.length === 0 && foundTourists.temp_tourists.length === 0) {
-    const fullName = [data.last_name, data.first_name].filter(Boolean).join(' ').trim()
+  if (!foundTourists.tourists.length && !foundTourists.temp_tourists.length) {
+    const fullName = [contact.LAST_NAME, contact.NAME].filter(Boolean).join(' ').trim()
 
     finalTourist = await createTourist({
       name: fullName || 'Неизвестный турист',
-      tel: data.phone || '',
-      email: data.email || '',
+      tel: contact.PHONE?.[0]?.VALUE || '',
+      email: contact.EMAIL?.[0]?.VALUE || '',
     })
   } else {
     if (foundTourists.tourists.length > 0) {
@@ -57,11 +58,11 @@ export async function handleFinalInvoice(data: DealData) {
   }
 
   // Создаем обращение
-  const addPreorderResponse = await createPreorder(finalTourist, data)
+  const addPreorderResponse = await createPreorder(finalTourist, deal)
   const preorderUrl = createPreorderLink(addPreorderResponse?.data.preorder_id || -1)
 
   // Обновляем сделку в Битрикс24
-  await BitrixApi.updateDeal(data.deal_id, {
+  await BitrixApi.updateDeal(dealId, {
     UF_CRM_1753433653919: preorderUrl,
   })
 }
@@ -109,13 +110,11 @@ async function convertTempTourist(tempTourist: TempTourist) {
   })
 }
 
-async function createPreorder(tourist: TempTourist, data: DealData) {
-  const preorderName = `${data.deal_name ?? 'Без названия сделки'}: ПОДГОТОВКА ДОКУМЕНТОВ ИЗ БИТРИКСА`
-
+async function createPreorder(tourist: TempTourist, deal: BitrixDeal) {
   const response = await MoiDokumentiApi.createPreorder({
     tourist_type: 'tourist',
     tourist_id: tourist.id,
-    comment: formatPreorderComment(data, preorderName),
+    comment: formatPreorderComment(deal),
   })
 
   return response

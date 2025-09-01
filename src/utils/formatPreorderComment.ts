@@ -1,13 +1,13 @@
-import type { DealData } from '@/routes/types.js'
+import type { BitrixDeal } from '@/api/bitrix/types.js'
 
-export function formatPreorderComment(data: DealData, preorderName: string): string {
+export function formatPreorderComment(deal: BitrixDeal): string {
   return [
-    `ID сделки Bitrix: ${data.deal_id}`,
-    `Название сделки Bitrix: ${preorderName}`,
-    `Тип услуги: ${data.deal_type ?? 'Не указано'}`,
-    `Формат тура: ${data.tour_format ?? 'Не указано'}`,
-    `Дата начала тура: ${data.tour_start_date ?? 'Не указано'}`,
-    `Дата окончания тура: ${data.tour_end_date ?? 'Не указано'}`,
-    `Стоимость тура: ${data.tour_price ?? 'Не указано'}`,
+    `ID сделки Bitrix: ${deal.ID}`,
+    `Название сделки Bitrix: ${deal.TITLE ?? 'Без названия сделки'}: ПОДГОТОВКА ДОКУМЕНТОВ ИЗ БИТРИКСА`,
+    `Тип услуги: ${deal.UF_CRM_1734090132316 ?? 'Не указано'}`,
+    `Формат тура: ${deal.UF_CRM_1734090442060 ?? 'Не указано'}`,
+    `Дата начала тура: ${deal.UF_CRM_1734090826 ?? 'Не указано'}`,
+    `Дата окончания тура: ${deal.UF_CRM_1734090894 ?? 'Не указано'}`,
+    `Стоимость тура: ${deal.UF_CRM_1737025764412 ?? 'Не указано'}`,
   ].join('\n')
 }
