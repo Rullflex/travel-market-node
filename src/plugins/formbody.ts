@@ -3,9 +3,9 @@ import formbody from '@fastify/formbody'
 import fp from 'fastify-plugin'
 
 /**
- * This plugins enables the use of CORS in a Fastify application
+ * This plugins adds a content type parser for the content type application/x-www-form-urlencoded
  *
- * @see https://github.com/fastify/fastify-cors
+ * @see https://github.com/fastify/fastify-formbody
  */
 export default fp<FastifyFormbodyOptions>(async (fastify) => {
   fastify.register(formbody)

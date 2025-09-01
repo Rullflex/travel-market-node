@@ -12,7 +12,7 @@ const routes: FastifyPluginAsyncJsonSchemaToTs = async (fastify, _opts): Promise
 
   fastify.post('/final-invoice', async (request, reply) => {
     try {
-      request.log.info(request.body)
+      return request.body
       // return await handleFinalInvoice(request.body)
     } catch (err) {
       const { message } = err as Error
