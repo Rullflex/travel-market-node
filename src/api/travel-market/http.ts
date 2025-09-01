@@ -19,6 +19,6 @@ export const http = axios.create({
       throw new Error(`[MoiDokumenti API]: ${response.description}`)
     }
 
-    return JSON.parse(data).data
+    return response.data
   },
 })

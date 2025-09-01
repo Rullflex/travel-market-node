@@ -10,31 +10,10 @@ const routes: FastifyPluginAsyncJsonSchemaToTs = async (fastify, _opts): Promise
     }
   })
 
-  fastify.get('/final-invoice', {
-    schema: {
-      querystring: {
-        type: 'object',
-        required: ['deal_id'],
-        properties: {
-          deal_id: { type: 'string' },
-          deal_name: { type: 'string' },
-          deal_type: { type: 'string' },
-
-          phone: { type: 'string' },
-          email: { type: 'string', format: 'email' },
-          first_name: { type: 'string' },
-          last_name: { type: 'string' },
-
-          tour_format: { type: 'string' },
-          tour_start_date: { type: 'string' },
-          tour_end_date: { type: 'string' },
-          tour_price: { type: 'string' },
-        },
-      } as const,
-    },
-  }, async (request, reply) => {
+  fastify.post('/final-invoice', async (request, reply) => {
     try {
-      return await handleFinalInvoice(request.query)
+      request.log.info(request.body)
+      // return await handleFinalInvoice(request.body)
     } catch (err) {
       const { message } = err as Error
       request.log.error(request.query, message)
