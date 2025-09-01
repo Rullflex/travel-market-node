@@ -13,7 +13,7 @@ const routes: FastifyPluginAsyncJsonSchemaToTs = async (fastify, _opts): Promise
   fastify.post('/final-invoice', async (req, reply) => {
     const { body } = req as { body: BitrixDealEvent }
 
-    req.log.debug(body)
+    req.log.info(body)
 
     if (!body) {
       return reply.badRequest('Body is empty')
