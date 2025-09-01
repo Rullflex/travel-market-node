@@ -23,12 +23,8 @@ const routes: FastifyPluginAsyncJsonSchemaToTs = async (fastify, _opts): Promise
       return reply.badRequest('Application token is invalid')
     }
 
-    if (body.event !== 'ONCRMDEALMOVETOCATEGORY') {
-      return reply.badRequest('Event is not ONCRMDEALMOVETOCATEGORY')
-    }
-
-    if (body.data.FIELDS.STAGE_ID !== 'FINAL_INVOICE') {
-      return reply.badRequest('Stage is not FINAL_INVOICE')
+    if (body.event !== 'ONCRMDEALMOVETOCATEGORY' || body.data.FIELDS.STAGE_ID !== 'FINAL_INVOICE') {
+      return
     }
 
     try {
