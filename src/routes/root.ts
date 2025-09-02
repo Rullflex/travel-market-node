@@ -13,8 +13,6 @@ const routes: FastifyPluginAsyncJsonSchemaToTs = async (fastify, _opts): Promise
   fastify.post('/final-invoice', async (req, reply) => {
     const { body } = req as { body: BitrixDealEvent }
 
-    console.log('body', body)
-
     if (!body) {
       return reply.badRequest('Body is empty')
     }
@@ -23,16 +21,17 @@ const routes: FastifyPluginAsyncJsonSchemaToTs = async (fastify, _opts): Promise
       return reply.badRequest('Application token is invalid')
     }
 
+    req.log.info(`event: ${body.event} deal id: ${body.data.FIELDS.ID}`)
+
     if (body.event !== 'ONCRMDEALUPDATE') {
       return
     }
 
     try {
-      return await handleFinalInvoice(body.data.FIELDS.ID)
+      const res = await handleFinalInvoice(body.data.FIELDS.ID)
+      req.log.info(res, 'RESULT')
     } catch (err) {
-      console.log('err', err)
       const { message } = err as Error
-      req.log.error(body, message)
       return reply.badRequest(message)
     }
   })
@@ -44,11 +43,12 @@ const routes: FastifyPluginAsyncJsonSchemaToTs = async (fastify, _opts): Promise
       return reply.badRequest('Body is empty')
     }
 
+    req.log.info(body)
+
     try {
       return await tourFullPayment(body)
     } catch (err) {
       const { message } = err as Error
-      req.log.error(body, message)
       return reply.badRequest(message)
     }
   })
