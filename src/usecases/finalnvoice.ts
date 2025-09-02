@@ -7,15 +7,11 @@ import { createPreorderLink, formatPreorderComment } from '@/utils/index.js'
 export async function handleFinalInvoice(dealId: string) {
   const { data: { result: deal } } = await BitrixApi.getDeal(dealId)
 
-  console.log('deal', deal.ID, deal.STAGE_ID)
-
   if (deal.STAGE_ID !== 'FINAL_INVOICE') {
     return
   }
 
   const { data: { result: contact } } = await BitrixApi.getContact(deal.CONTACT_ID)
-
-  console.log('contact', contact.ID, contact.LAST_NAME, contact.NAME, contact.PHONE, contact.EMAIL)
 
   let foundTourists: {
     tourists: Awaited<ReturnType<typeof searchTourists>>['tourists']
@@ -68,7 +64,7 @@ export async function handleFinalInvoice(dealId: string) {
 
   // Создаем обращение
   const addPreorderResponse = await createPreorder(finalTourist, deal)
-  const preorderUrl = createPreorderLink(addPreorderResponse?.data.preorder_id || -1)
+  const preorderUrl = createPreorderLink(addPreorderResponse.preorder_id || -1)
 
   // Обновляем сделку в Битрикс24
   await BitrixApi.updateDeal(dealId, {
@@ -95,10 +91,11 @@ async function searchTourists(searchValue: string) {
 }
 
 async function createTourist(touristData: Partial<Tourist>) {
-  const response = await MoiDokumentiApi.addTourist(touristData)
+  await MoiDokumentiApi.addTourist(touristData)
+  const { data } = await MoiDokumentiApi.getTourists({ search: touristData.name || touristData.tel || touristData.email, fields: ['id'] })
 
   return {
-    id: response.data.tourist_id,
+    id: data[data.length - 1].id,
     name: touristData.name || '',
     tel: touristData.tel || '',
     email: touristData.email || '',
@@ -120,11 +117,13 @@ async function convertTempTourist(tempTourist: TempTourist) {
 }
 
 async function createPreorder(tourist: TempTourist, deal: BitrixDeal) {
-  const response = await MoiDokumentiApi.createPreorder({
+  await MoiDokumentiApi.createPreorder({
     tourist_type: 'tourist',
     tourist_id: tourist.id,
     comment: formatPreorderComment(deal),
   })
 
-  return response
+  const response = await MoiDokumentiApi.getPreorders({ tourist_id: tourist.id, fields: ['preorder_id'] })
+
+  return response.data[response.data.length - 1]
 }

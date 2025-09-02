@@ -6,7 +6,7 @@ export const MoiDokumentiApi = {
     return http.post<{ [K in T[number]]: Tourist[K] }[]>('get-tourist-list', params)
   },
   addTourist: (params: Partial<Tourist>) => {
-    return http.post<{ tourist_id: number }>('add-tourist', params)
+    return http.post<undefined>('add-tourist', params)
   },
 
   getTempTourists: <T extends (keyof TempTourist)[]>(params?: TouristParams<T>) => {
@@ -20,7 +20,7 @@ export const MoiDokumentiApi = {
     return http.post<{ [K in T[number]]: Preorder[K] }[]>('get-preorder-list', params)
   },
   createPreorder: (params: CreatePreorderParams) => {
-    return http.post<Preorder>('create-preorder', params)
+    return http.post<undefined>('create-preorder', params)
   },
 
   getPayments: (params?: PaymentParams) => http.post<Payment[]>('get-payment-list', params),
