@@ -23,7 +23,7 @@ const routes: FastifyPluginAsyncJsonSchemaToTs = async (fastify, _opts): Promise
       return reply.badRequest('Application token is invalid')
     }
 
-    if (body.event !== 'ONCRMCONTACTUPDATE') {
+    if (body.event !== 'ONCRMDEALUPDATE') {
       return
     }
 
