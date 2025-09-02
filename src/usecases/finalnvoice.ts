@@ -4,7 +4,15 @@ import { BitrixApi } from '@/api/bitrix/index.js'
 import { MoiDokumentiApi } from '@/api/travel-market/index.js'
 import { createPreorderLink, formatPreorderComment } from '@/utils/index.js'
 
+const processedDeals = new Set<string>()
+
 export async function handleFinalInvoice(dealId: string) {
+  if (processedDeals.has(dealId)) {
+    return
+  }
+
+  processedDeals.add(dealId)
+
   const { data: { result: deal } } = await BitrixApi.getDeal(dealId)
 
   if (deal.STAGE_ID !== 'FINAL_INVOICE') {
