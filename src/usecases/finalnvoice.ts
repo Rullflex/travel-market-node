@@ -93,6 +93,7 @@ async function searchTourists(searchValue: string) {
 async function createTourist(touristData: Partial<Tourist>) {
   await MoiDokumentiApi.addTourist(touristData)
   const { data } = await MoiDokumentiApi.getTourists({ search: touristData.name || touristData.tel || touristData.email, fields: ['id'] })
+  console.log('getTourists', data, JSON.stringify(touristData))
 
   return {
     id: data[data.length - 1].id,
@@ -124,6 +125,7 @@ async function createPreorder(tourist: TempTourist, deal: BitrixDeal) {
   })
 
   const response = await MoiDokumentiApi.getPreorders({ tourist_id: tourist.id, fields: ['preorder_id'] })
+  console.log('getTourists', response, tourist.id)
 
   return response.data[response.data.length - 1]
 }
