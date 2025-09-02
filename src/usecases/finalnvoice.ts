@@ -125,7 +125,7 @@ async function createPreorder(tourist: TempTourist, deal: BitrixDeal) {
   })
 
   const response = await MoiDokumentiApi.getPreorders({ tourist_id: tourist.id, fields: ['preorder_id'] })
-  console.log('getTourists', response, tourist.id)
+  console.log('getPreorders', response, tourist.id)
 
   return response.data[response.data.length - 1]
 }
