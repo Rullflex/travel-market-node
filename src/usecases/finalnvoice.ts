@@ -7,7 +7,7 @@ import { createPreorderLink, formatPreorderComment } from '@/utils/index.js'
 export async function handleFinalInvoice(dealId: string) {
   const { data: { result: deal } } = await BitrixApi.getDeal(dealId)
 
-  console.log('deal', deal)
+  console.log('deal', deal.ID, deal.STAGE_ID)
 
   if (deal.STAGE_ID !== 'FINAL_INVOICE') {
     return
@@ -15,7 +15,7 @@ export async function handleFinalInvoice(dealId: string) {
 
   const { data: { result: contact } } = await BitrixApi.getContact(deal.CONTACT_ID)
 
-  console.log('contact', contact)
+  console.log('contact', contact.ID, contact.LAST_NAME, contact.NAME, contact.PHONE, contact.EMAIL)
 
   let foundTourists: {
     tourists: Awaited<ReturnType<typeof searchTourists>>['tourists']
