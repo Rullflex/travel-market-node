@@ -12,28 +12,32 @@ export async function tourFullPayment(data: TourFullPaymentData) {
     throw new Error(`Туры по ID ${data.tour_id} не нашлись`)
   }
 
-  if (!tours[0].preorder_id) {
+  const tourPreorderId = tours[tours.length - 1].preorder_id
+
+  if (!tourPreorderId) {
     throw new Error(`Тур по ID ${data.tour_id} не имеет обращений`)
   }
 
   const { data: preorders } = await MoiDokumentiApi.getPreorders({
-    preorder_id: tours[0].preorder_id,
+    preorder_id: tourPreorderId,
     fields: ['comment'],
   })
 
   if (!preorders.length) {
-    throw new Error(`Обращения по ID ${tours[0].preorder_id} не нашлись`)
+    throw new Error(`Обращения по ID ${tourPreorderId} не нашлись`)
   }
 
-  if (!preorders[0].comment) {
-    throw new Error(`Обращение по ID ${tours[0].preorder_id} не имеет комментария`)
+  const preorderComment = preorders[preorders.length - 1].comment
+
+  if (!preorderComment) {
+    throw new Error(`Обращение по ID ${tourPreorderId} не имеет комментария`)
   }
 
-  const bitrixDealIdMatch = preorders[0].comment.match(/ID сделки Bitrix: (\d+)/)
+  const bitrixDealIdMatch = preorderComment.match(/ID сделки Bitrix: (\d+)/)
   const bitrixDealId = bitrixDealIdMatch ? bitrixDealIdMatch[1] : null
 
   if (!bitrixDealId) {
-    throw new Error(`Комментарий обращения по ID ${tours[0].preorder_id} не содержит ID сделки Bitrix`)
+    throw new Error(`Комментарий обращения по ID ${tourPreorderId} не содержит ID сделки Bitrix`)
   }
 
   await BitrixApi.updateDeal(bitrixDealId, {
