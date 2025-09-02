@@ -1,6 +1,7 @@
 import type { FastifyPluginAsyncJsonSchemaToTs } from '@fastify/type-provider-json-schema-to-ts'
 import type { BitrixDealEvent, TourFullPaymentData } from './types.js'
-import { handleFinalInvoice, tourFullPayment } from '@/usecases/index.js'
+import { BitrixApi } from '@/api/bitrix/BitrixApi.js'
+import { tourFullPayment } from '@/usecases/index.js'
 
 const routes: FastifyPluginAsyncJsonSchemaToTs = async (fastify, _opts): Promise<void> => {
   fastify.get('/', async () => {
@@ -23,12 +24,16 @@ const routes: FastifyPluginAsyncJsonSchemaToTs = async (fastify, _opts): Promise
       return reply.badRequest('Application token is invalid')
     }
 
-    if (body.event !== 'ONCRMDEALMOVETOCATEGORY' || body.data.FIELDS.STAGE_ID !== 'FINAL_INVOICE') {
+    if (body.event !== 'ONCRMCONTACTUPDATE') {
       return
     }
 
+    const { data: { result: deal } } = await BitrixApi.getDeal(body.data.FIELDS.ID)
+
+    console.log('deal', deal)
+
     try {
-      return await handleFinalInvoice(body.data.FIELDS.ID)
+      // return await handleFinalInvoice(body.data.FIELDS.ID)
     } catch (err) {
       const { message } = err as Error
       req.log.error(body, message)

@@ -18,7 +18,7 @@ export interface TourFullPaymentData {
 export type BitrixDealEvent = BitrixDealUpdateEvent | BitrixDealMoveToCategoryEvent
 
 export interface BitrixDealUpdateEvent {
-  event: 'ONCRMDEALUPDATE'
+  event: 'ONCRMDEALUPDATE' | 'ONCRMCONTACTUPDATE'
   event_handler_id: string
   data: {
     FIELDS: {
