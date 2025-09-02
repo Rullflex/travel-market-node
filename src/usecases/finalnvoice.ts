@@ -6,6 +6,11 @@ import { createPreorderLink, formatPreorderComment } from '@/utils/index.js'
 
 export async function handleFinalInvoice(dealId: string) {
   const { data: { result: deal } } = await BitrixApi.getDeal(dealId)
+
+  if (deal.STAGE_ID !== 'FINAL_INVOICE') {
+    return
+  }
+
   const { data: { result: contact } } = await BitrixApi.getContact(deal.CONTACT_ID)
 
   let foundTourists: {
