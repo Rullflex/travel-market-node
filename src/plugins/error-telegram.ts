@@ -11,7 +11,7 @@ export default fp(async (fastify) => {
     try {
       axios.post(`https://api.telegram.org/bot${NOTIFICATIONS_BOT_TOKEN}/sendMessage`, {
         chat_id: NOTIFICATIONS_CHAT_ID,
-        text: `🔥 Ошибка интеграции: ${request.url}\n\n${error.stack}`,
+        text: `🔥 Ошибка интеграции: ${request.url}\n\n[${error.code} ${error.name}]\n${error.message}`,
       })
     } catch (err) {
       request.log.error({ err }, 'Не удалось отправить лог в Telegram')
