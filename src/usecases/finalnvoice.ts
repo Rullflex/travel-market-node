@@ -7,17 +7,13 @@ import { createPreorderLink, formatPreorderComment } from '@/utils/index.js'
 const processedDeals = new Set<string>()
 
 export async function handleFinalInvoice(dealId: string) {
-  if (processedDeals.has(dealId)) {
+  const { data: { result: deal } } = await BitrixApi.getDeal(dealId)
+
+  if (deal.STAGE_ID !== 'FINAL_INVOICE' || processedDeals.has(dealId)) {
     return
   }
 
   processedDeals.add(dealId)
-
-  const { data: { result: deal } } = await BitrixApi.getDeal(dealId)
-
-  if (deal.STAGE_ID !== 'FINAL_INVOICE') {
-    return
-  }
 
   const { data: { result: contact } } = await BitrixApi.getContact(deal.CONTACT_ID)
 
