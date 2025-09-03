@@ -28,7 +28,8 @@ const routes: FastifyPluginAsyncJsonSchemaToTs = async (fastify, _opts): Promise
     }
 
     try {
-      await handleFinalInvoice(body.data.FIELDS.ID)
+      const res = await handleFinalInvoice(body.data.FIELDS.ID)
+      res && req.log.info(res)
     } catch (err) {
       const { message } = err as Error
       return reply.badRequest(message)

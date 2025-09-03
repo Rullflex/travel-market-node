@@ -104,7 +104,7 @@ async function searchTourists(searchValue: string) {
 
 async function createTourist(touristData: Partial<Tourist>) {
   await MoiDokumentiApi.addTourist(touristData)
-  const { data } = await MoiDokumentiApi.getTourists({ search: touristData.name || touristData.tel || touristData.email, fields: ['id'] })
+  const { data } = await MoiDokumentiApi.getTourists({ search: touristData.tel || touristData.email || touristData.name, fields: ['id'] })
 
   return {
     id: data[data.length - 1].id,
