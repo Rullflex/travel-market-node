@@ -44,9 +44,11 @@ export async function handleFinalInvoice(dealId: string) {
       email: contact.EMAIL?.[0]?.VALUE || '',
     })
   } else {
+    const searchName = contact.NAME?.toLowerCase()
+    const findByName = (tourist: { name: string }) => searchName && tourist.name.toLowerCase().includes(searchName)
     if (foundTourists.tourists.length > 0) {
-      // Если есть обычные туристы, берем последнего
-      const lastTourist = foundTourists.tourists[foundTourists.tourists.length - 1]
+      // Если есть обычные туристы, пытаемся найти нужного или последнего
+      const lastTourist = foundTourists.tourists.find(findByName) || foundTourists.tourists[foundTourists.tourists.length - 1]
       finalTourist = {
         id: lastTourist.id,
         name: lastTourist.name,
@@ -57,7 +59,7 @@ export async function handleFinalInvoice(dealId: string) {
       }
     } else if (foundTourists.temp_tourists.length > 0) {
       // Если есть только временные турист, конвертируем его в обычного
-      const tempTourist = foundTourists.temp_tourists[foundTourists.temp_tourists.length - 1]
+      const tempTourist = foundTourists.temp_tourists.find(findByName) || foundTourists.temp_tourists[foundTourists.temp_tourists.length - 1]
       finalTourist = await convertTempTourist(tempTourist)
     }
   }
