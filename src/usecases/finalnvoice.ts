@@ -1,8 +1,9 @@
 import type { BitrixDeal } from '@/api/bitrix/index.js'
 import type { TempTourist, Tourist } from '@/api/travel-market/types.js'
+import { intersectionBy } from 'lodash-es'
 import { BitrixApi } from '@/api/bitrix/index.js'
 import { MoiDokumentiApi } from '@/api/travel-market/index.js'
-import { createPreorderLink, formatPreorderComment } from '@/utils/index.js'
+import { createPreorderLink, extractDatePart, formatPreorderComment } from '@/utils/index.js'
 
 const processedDeals = new Set<string>()
 
@@ -16,60 +17,23 @@ export async function handleFinalInvoice(dealId: string) {
   processedDeals.add(dealId)
 
   const { data: { result: contact } } = await BitrixApi.getContact(deal.CONTACT_ID)
+  const phone = contact.PHONE?.[0]?.VALUE
+  const email = contact.EMAIL?.[0]?.VALUE
+  const birthDate = contact.BIRTHDATE && extractDatePart(contact.BIRTHDATE)
 
-  let foundTourists: {
-    tourists: Awaited<ReturnType<typeof searchTourists>>['tourists']
-    temp_tourists: Awaited<ReturnType<typeof searchTourists>>['temp_tourists']
-  } = { tourists: [], temp_tourists: [] }
-
-  // Поиск по телефону
-  if (contact.PHONE?.length) {
-    foundTourists = await searchTourists(contact.PHONE[0].VALUE)
+  if (!phone || !email || !birthDate) {
+    throw new Error(`У контакта с ID ${deal.CONTACT_ID} нет телефона, email или даты рождения`)
   }
 
-  // Если не найдено по телефону и есть email — ищем по email
-  if (!foundTourists.tourists.length && !foundTourists.temp_tourists.length && contact.EMAIL?.length) {
-    foundTourists = await searchTourists(contact.EMAIL[0].VALUE)
-  }
+  const fullName = [contact.LAST_NAME, contact.NAME].filter(Boolean).join(' ').trim() || 'Неизвестный турист'
+  const finalTouristId = await findFinalTouristId(phone, email, birthDate, fullName)
 
-  let finalTourist: Awaited<ReturnType<typeof createTourist>> | null = null
-
-  // Если никого не нашли - создаем нового туриста
-  if (!foundTourists.tourists.length && !foundTourists.temp_tourists.length) {
-    const fullName = [contact.LAST_NAME, contact.NAME].filter(Boolean).join(' ').trim()
-
-    finalTourist = await createTourist({
-      name: fullName || 'Неизвестный турист',
-      tel: contact.PHONE?.[0]?.VALUE || '',
-      email: contact.EMAIL?.[0]?.VALUE || '',
-    })
-  } else {
-    const searchName = contact.NAME?.toLowerCase()
-    const findByName = (tourist: { name: string }) => searchName && tourist.name.toLowerCase().includes(searchName)
-    if (foundTourists.tourists.length > 0) {
-      // Если есть обычные туристы, пытаемся найти нужного или последнего
-      const lastTourist = foundTourists.tourists.find(findByName) || foundTourists.tourists[foundTourists.tourists.length - 1]
-      finalTourist = {
-        id: lastTourist.id,
-        name: lastTourist.name,
-        tel: lastTourist.tel,
-        email: lastTourist.email,
-        manager_id: lastTourist.manager_id,
-        office_id: lastTourist.office_id,
-      }
-    } else if (foundTourists.temp_tourists.length > 0) {
-      // Если есть только временные турист, конвертируем его в обычного
-      const tempTourist = foundTourists.temp_tourists.find(findByName) || foundTourists.temp_tourists[foundTourists.temp_tourists.length - 1]
-      finalTourist = await convertTempTourist(tempTourist)
-    }
-  }
-
-  if (!finalTourist) {
+  if (!finalTouristId) {
     throw new Error('Не удалось создать туриста')
   }
 
   // Создаем обращение
-  const addPreorderResponse = await createPreorder(finalTourist, deal)
+  const addPreorderResponse = await createPreorder(finalTouristId, deal)
   const preorderUrl = createPreorderLink(addPreorderResponse.preorder_id || -1)
 
   // Обновляем сделку в Битрикс24
@@ -82,62 +46,114 @@ export async function handleFinalInvoice(dealId: string) {
     dealStage: deal.STAGE_ID,
     contactId: contact.ID,
     preorderId: addPreorderResponse.preorder_id,
-    finalTourist,
+    finalTouristId,
   }
 }
 
-async function searchTourists(searchValue: string) {
-  const [tourists, tempTourists] = await Promise.all([
-    MoiDokumentiApi.getTourists({
-      fields: ['id', 'name', 'tel', 'email', 'manager_id', 'office_id'],
-      search: searchValue,
-    }),
-    MoiDokumentiApi.getTempTourists({
-      fields: ['id', 'name', 'tel', 'email', 'manager_id', 'office_id'],
-      search: searchValue,
-    }),
-  ])
+async function findFinalTouristId(phone: string, email: string, birthDate: string, newFullName?: string) {
+  const tourist = await findParticularTourist(phone, email, birthDate)
 
-  return {
-    tourists: tourists.data,
-    temp_tourists: tempTourists.data,
+  if (tourist) {
+    await MoiDokumentiApi.updateTourist(tourist) // Обновляем данные туриста где могли не совпасть или отсутствовали имя, телефон, email
+    return tourist.id
   }
+
+  const tempTourist = await findParticularTempTourist(phone, email)
+
+  if (tempTourist) {
+    return await convertTempTourist(tempTourist, birthDate)
+  }
+
+  return await createTourist({
+    name: newFullName,
+    tel: phone,
+    email,
+    dr: birthDate,
+  })
+}
+
+async function findParticularTourist(phone: string, email: string, birthDate: string) {
+  const [touristsByPhone, touristsByEmail] = await Promise.all([searchTourists(phone), searchTourists(email)])
+  const matchByBirthDate = (t: Awaited<ReturnType<typeof searchTourists>>[0]) => t.dr === birthDate
+  const byPhoneAndEmail = intersectionBy(touristsByPhone, touristsByEmail, 'id')
+
+  if (byPhoneAndEmail.length) {
+    const exact = byPhoneAndEmail.find(matchByBirthDate)
+
+    return exact || {
+      ...byPhoneAndEmail[0],
+      dr: birthDate,
+    }
+  }
+
+  const byPhoneAndBirthDate = touristsByPhone.find(matchByBirthDate)
+  if (byPhoneAndBirthDate) {
+    return {
+      ...byPhoneAndBirthDate,
+      email,
+    }
+  }
+
+  const byEmailAndBirthDate = touristsByEmail.find(matchByBirthDate)
+  if (byEmailAndBirthDate) {
+    return {
+      ...byEmailAndBirthDate,
+      tel: phone,
+    }
+  }
+
+  return null
+}
+
+async function findParticularTempTourist(phone: string, email: string) {
+  const [tempTouristsByPhone, tempTouristsByEmail] = await Promise.all([searchTempTourists(phone), searchTempTourists(email)])
+  const tempTourists = intersectionBy(tempTouristsByPhone, tempTouristsByEmail, 'id')
+
+  return tempTourists.length ? tempTourists[0] : null
+}
+
+async function searchTourists(phoneOrEmail: string) {
+  return MoiDokumentiApi.getTourists({
+    fields: ['id', 'name', 'tel', 'email', 'dr', 'manager_id', 'office_id'],
+    search: phoneOrEmail,
+  }).then(res => res.data)
+}
+
+async function searchTempTourists(phoneOrEmail: string) {
+  return MoiDokumentiApi.getTempTourists({
+    fields: ['id', 'name', 'tel', 'email', 'manager_id', 'office_id'],
+    search: phoneOrEmail,
+  }).then(res => res.data)
 }
 
 async function createTourist(touristData: Partial<Tourist>) {
   await MoiDokumentiApi.addTourist(touristData)
   const { data } = await MoiDokumentiApi.getTourists({ search: touristData.tel || touristData.email || touristData.name, fields: ['id'] })
 
-  return {
-    id: data[data.length - 1].id,
-    name: touristData.name || '',
-    tel: touristData.tel || '',
-    email: touristData.email || '',
-    manager_id: touristData.manager_id,
-    office_id: touristData.office_id,
-  }
+  return data[data.length - 1].id
 }
 
-async function convertTempTourist(tempTourist: TempTourist) {
+async function convertTempTourist(tempTourist: TempTourist, dr: string) {
   await MoiDokumentiApi.deleteTempTourist(tempTourist.id)
 
   return createTourist({
     name: tempTourist.name,
     tel: tempTourist.tel,
     email: tempTourist.email,
+    dr,
     manager_id: tempTourist.manager_id,
     office_id: tempTourist.office_id,
   })
 }
 
-async function createPreorder(tourist: TempTourist, deal: BitrixDeal) {
+async function createPreorder(touristId: number, deal: BitrixDeal) {
   await MoiDokumentiApi.createPreorder({
     tourist_type: 'tourist',
-    tourist_id: tourist.id,
+    tourist_id: touristId,
     comment: formatPreorderComment(deal),
   })
 
-  const response = await MoiDokumentiApi.getPreorders({ tourist_id: tourist.id, fields: ['preorder_id'] })
+  const response = await MoiDokumentiApi.getPreorders({ tourist_id: touristId, fields: ['preorder_id'] })
 
   return response.data[response.data.length - 1]
 }

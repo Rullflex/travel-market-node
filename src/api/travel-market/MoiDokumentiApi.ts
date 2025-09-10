@@ -5,8 +5,11 @@ export const MoiDokumentiApi = {
   getTourists: <T extends (keyof Tourist)[]>(params?: TouristParams<T>) => {
     return http.post<{ [K in T[number]]: Tourist[K] }[]>('get-tourist-list', params)
   },
-  addTourist: (params: Partial<Tourist>) => {
+  addTourist: (params: Partial<Omit<Tourist, 'id'>>) => {
     return http.post<undefined>('add-tourist', params)
+  },
+  updateTourist: (params: Partial<Tourist>) => {
+    return http.post<undefined>('edit-tourist', params)
   },
 
   getTempTourists: <T extends (keyof TempTourist)[]>(params?: TouristParams<T>) => {
