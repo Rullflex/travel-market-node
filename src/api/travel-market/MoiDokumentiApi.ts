@@ -8,8 +8,21 @@ export const MoiDokumentiApi = {
   addTourist: (params: Partial<Omit<Tourist, 'id'>>) => {
     return http.post<undefined>('add-tourist', params)
   },
+  /**
+   * Обновляет данные туриста, полностью заменяя их новыми, обнуляя старые если данные не переданы.
+   * Для того чтобы обновить часть данных, не изменяя старые используйте updateTouristKeepingOld
+   */
   updateTourist: (params: Partial<Tourist>) => {
     return http.post<undefined>('edit-tourist', params)
+  },
+  updateTouristKeepingOld: async (newData: Partial<Tourist> & { id: number }) => {
+    const { data: oldData } = await MoiDokumentiApi.getTourists({ id: newData.id, fields: ['id', 'name', 'name_lat', 'address', 'tel', 'dr', 'passport_series', 'passport_number', 'passport_who', 'passport_when', 'passport_till', 'gender', 'email', 'passport_series_rus', 'passport_number_rus', 'passport_who_rus', 'passport_when_rus', 'receive_sms', 'receive_email', 'manager_id', 'office_id'] })
+
+    if (oldData.length === 0) {
+      throw new Error(`Попытка обновить несуществующего туриста с ID ${newData.id}`)
+    }
+
+    return MoiDokumentiApi.updateTourist({ ...oldData[0], ...newData })
   },
 
   getTempTourists: <T extends (keyof TempTourist)[]>(params?: TouristParams<T>) => {

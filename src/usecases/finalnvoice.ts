@@ -50,7 +50,7 @@ async function findFinalTouristId(phone: string, email: string, birthDate: strin
   const tourist = await findParticularTourist(phone, email, birthDate)
 
   if (tourist) {
-    await MoiDokumentiApi.updateTourist(tourist) // Обновляем данные туриста где могли не совпасть или отсутствовали имя, телефон, email
+    await MoiDokumentiApi.updateTouristKeepingOld(tourist) // Обновляем данные туриста где могли не совпасть или отсутствовали имя, телефон, email
     return tourist.id
   }
 
