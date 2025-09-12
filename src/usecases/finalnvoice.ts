@@ -5,16 +5,12 @@ import { BitrixApi } from '@/api/bitrix/index.js'
 import { MoiDokumentiApi } from '@/api/travel-market/index.js'
 import { createPreorderLink, extractDatePart, formatPreorderComment } from '@/utils/index.js'
 
-const processedDeals = new Set<string>()
-
 export async function handleFinalInvoice(dealId: string) {
   const { data: { result: deal } } = await BitrixApi.getDeal(dealId)
 
-  if (deal.STAGE_ID !== 'FINAL_INVOICE' || processedDeals.has(dealId)) {
+  if (deal.STAGE_ID !== 'FINAL_INVOICE' || deal.UF_CRM_1753433653919) {
     return
   }
-
-  processedDeals.add(dealId)
 
   const { data: { result: contact } } = await BitrixApi.getContact(deal.CONTACT_ID)
   const phone = contact.PHONE?.[0]?.VALUE
@@ -22,14 +18,14 @@ export async function handleFinalInvoice(dealId: string) {
   const birthDate = contact.BIRTHDATE && extractDatePart(contact.BIRTHDATE)
 
   if (!phone || !email || !birthDate) {
-    throw new Error(`У контакта с ID ${deal.CONTACT_ID} нет телефона, email или даты рождения`)
+    throw new Error(`У контакта с ID ${deal.CONTACT_ID} нет телефона, email или даты рождения. Сделка: ${dealId}`)
   }
 
   const fullName = [contact.LAST_NAME, contact.NAME].filter(Boolean).join(' ').trim() || 'Неизвестный турист'
   const finalTouristId = await findFinalTouristId(phone, email, birthDate, fullName)
 
   if (!finalTouristId) {
-    throw new Error('Не удалось создать туриста')
+    throw new Error(`Не удалось создать туриста для сделки ${dealId}`)
   }
 
   // Создаем обращение
