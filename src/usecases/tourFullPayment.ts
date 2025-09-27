@@ -40,7 +40,7 @@ export async function tourFullPayment(data: TourFullPaymentData) {
     throw new Error(`Комментарий обращения по ID ${tourPreorderId} не содержит ID сделки Bitrix`)
   }
 
-  return await BitrixApi.updateDeal(bitrixDealId, {
+  await BitrixApi.updateDeal(bitrixDealId, {
     UF_CRM_1756466640: data.country,
     UF_CRM_1756466774: `${data.tour_date_start} - ${data.tour_date_end}`,
     UF_CRM_1756466816: data.tourists,
@@ -55,4 +55,11 @@ export async function tourFullPayment(data: TourFullPaymentData) {
   }).catch((error) => {
     throw new Error(`[BitrixApi.updateDeal]: ${error.message}`)
   })
+
+  return {
+    message: 'Тур оплачен, сделка успешно обновлена',
+    tourId: data.tour_id,
+    tourPreorderId,
+    bitrixDealId,
+  }
 }
